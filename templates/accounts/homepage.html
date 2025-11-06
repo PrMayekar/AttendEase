@@ -5,29 +5,516 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
-    <link rel="stylesheet" href="{% static 'accounts/homepage.css' %}">
-</head>
-<!-- <body>
-    <h1>Welcome to homepage {{fname}}</h1>
-    <p>Click here to enter subject details and timetable</p>
-    <a href="/db1"><button>Enter</button></a>
-</body> -->
-    <body>
+    <title>AttendEase - Homepage</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        <!-- Messages Section -->
-        {% for message in messages %}
-        <div class="alert alert-{{message.tags}}" role="alert">
-            <div class="alert-content">
-                <div class="alert-text">
-                    <strong>Message:</strong> {{message}}
-                </div>
-                <button type="button" class="alert-close" onclick="this.parentElement.parentElement.style.display='none'">
-                    ×
-                </button>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Shapes */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            top: 50%;
+            right: -200px;
+            animation-delay: 3s;
+            animation-duration: 25s;
+        }
+
+        .shape:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            bottom: -125px;
+            left: 20%;
+            animation-delay: 6s;
+            animation-duration: 22s;
+        }
+
+        .shape:nth-child(4) {
+            width: 350px;
+            height: 350px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 2s;
+            animation-duration: 28s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(50px, 50px) rotate(90deg);
+            }
+            50% {
+                transform: translate(0, 100px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-50px, 50px) rotate(270deg);
+            }
+        }
+
+        /* Alert Styles */
+        .alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            z-index: 1000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .alert-content {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            gap: 15px;
+            position: relative;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 5px solid #28a745;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+            border-left: 5px solid #ffc107;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-left: 5px solid #dc3545;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            border-left: 5px solid #17a2b8;
+        }
+
+        .alert-text {
+            flex: 1;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .alert-text strong {
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .alert-close {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 5px;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .alert-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            transform: rotate(90deg);
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        /* Logo */
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: logoFloat 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .logo::before {
+            content: '📚';
+            font-size: 4rem;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome-text {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.95);
+            animation: fadeIn 1s ease 0.2s backwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        #userName {
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #ffd89b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            animation: fadeIn 1s ease 0.4s backwards;
+        }
+
+        /* CTA Buttons */
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 40px 0 60px;
+            animation: fadeIn 1s ease 0.6s backwards;
+        }
+
+        .cta-button {
+            padding: 18px 45px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            background: white;
+        }
+
+        .cta-button.secondary {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .cta-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 80px;
+            animation: fadeIn 1s ease 0.8s backwards;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .feature:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .feature:nth-child(1) .feature-icon {
+            animation-delay: 0s;
+        }
+
+        .feature:nth-child(2) .feature-icon {
+            animation-delay: 0.2s;
+        }
+
+        .feature:nth-child(3) .feature-icon {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .feature-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .feature-desc {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            margin: 80px 0 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            animation: fadeIn 1s ease 1s backwards;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #fff;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Ripple Effect */
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .welcome-text {
+                font-size: 1.2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .logo {
+                width: 100px;
+                height: 100px;
+            }
+
+            .logo::before {
+                font-size: 3rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .cta-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scrollBounce 2s infinite;
+        }
+
+        .scroll-indicator i {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        @keyframes scrollBounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Messages Section -->
+    {% for message in messages %}
+    <div class="alert alert-{{message.tags|default:'info'}}" role="alert">
+        <div class="alert-content">
+            <div class="alert-text">
+                <strong>Message:</strong> {{message}}
             </div>
+            <button type="button" class="alert-close" onclick="this.parentElement.parentElement.style.display='none'">
+                ×
+            </button>
         </div>
-        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <!-- Animated Background Shapes -->
     <div class="bg-shapes">
         <div class="shape"></div>
         <div class="shape"></div>
@@ -36,82 +523,136 @@
     </div>
 
     <div class="container">
+        <!-- Logo -->
         <div class="logo"></div>
         
+        <!-- Main Heading -->
         <h1>AttendEase</h1>
-        <p class="welcome-text">Welcome back, <span id="userName">{{fname}}</span>!</p>
+        <p class="welcome-text">Welcome back, <span id="userName">{{fname}}</span>! 👋</p>
         <p class="subtitle">Take control of your academic journey. Track your attendance, manage your schedule, and never miss what matters most.</p>
         
-        <a href="/db1" class="cta-button">
-            Get Started →
-        </a>
-
-        <div>
-            <label for="">Click Here to Continue Tracking Current Semester: </label>
-            <a href="/continue_tracking"><button>Track</button></a>
+        <!-- CTA Buttons -->
+        <div class="cta-buttons">
+            <a href="/db1" class="cta-button">
+                <i class="fas fa-rocket"></i>
+                Start New Semester
+            </a>
+            <a href="/continue_tracking" class="cta-button secondary">
+                <i class="fas fa-play-circle"></i>
+                Continue Tracking
+            </a>
         </div>
 
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">Accuracy</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">24/7</span>
+                <span class="stat-label">Access</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">∞</span>
+                <span class="stat-label">Subjects</span>
+            </div>
+        </div>
+
+        <!-- Features Section -->
         <div class="features">
             <div class="feature">
                 <div class="feature-icon">📊</div>
                 <div class="feature-title">Track Progress</div>
-                <div class="feature-desc">Monitor your attendance in real-time</div>
+                <div class="feature-desc">Monitor your attendance in real-time with detailed analytics and insights</div>
             </div>
             <div class="feature">
                 <div class="feature-icon">📅</div>
                 <div class="feature-title">Manage Schedule</div>
-                <div class="feature-desc">Organize your subjects and timetable</div>
+                <div class="feature-desc">Organize your subjects and timetable with smart calendar integration</div>
             </div>
             <div class="feature">
                 <div class="feature-icon">🎯</div>
                 <div class="feature-title">Stay on Track</div>
-                <div class="feature-desc">Never fall below attendance requirements</div>
+                <div class="feature-desc">Never fall below attendance requirements with proactive alerts</div>
             </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
         </div>
     </div>
 
     <script>
-        // Add some interactive elements
+        // Ripple effect on buttons
         document.addEventListener('DOMContentLoaded', function() {
-            const button = document.querySelector('.cta-button');
+            const buttons = document.querySelectorAll('.cta-button');
             
-            button.addEventListener('click', function(e) {
-                // Create ripple effect
-                const ripple = document.createElement('span');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                const x = e.clientX - rect.left - size / 2;
-                const y = e.clientY - rect.top - size / 2;
-                
-                ripple.style.width = ripple.style.height = size + 'px';
-                ripple.style.left = x + 'px';
-                ripple.style.top = y + 'px';
-                ripple.style.position = 'absolute';
-                ripple.style.borderRadius = '50%';
-                ripple.style.background = 'rgba(255, 255, 255, 0.6)';
-                ripple.style.transform = 'scale(0)';
-                ripple.style.animation = 'ripple 0.6s linear';
-                ripple.style.pointerEvents = 'none';
-                
-                this.appendChild(ripple);
-                
-                setTimeout(() => {
-                    ripple.remove();
-                }, 600);
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.pointerEvents = 'none';
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
             });
-        });
 
-        // Add ripple animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+            // Add hover effect to feature cards
+            const features = document.querySelectorAll('.feature');
+            features.forEach(feature => {
+                feature.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                feature.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(() => {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(alert => {
+                    alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateX(-50%) translateY(-30px)';
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+
+            // Animate stats on scroll
+            const observerOptions = {
+                threshold: 0.5
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'fadeIn 0.6s ease';
+                    }
+                });
+            }, observerOptions);
+
+            const statsCards = document.querySelectorAll('.stat-card');
+            statsCards.forEach(card => observer.observe(card));
+        });
     </script>
 </body>
 </html>

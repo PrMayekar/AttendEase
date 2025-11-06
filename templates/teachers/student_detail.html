@@ -1,0 +1,608 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details - {{ student_user.first_name }} {{ student_user.last_name }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .navbar {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: #e2e8f0;
+            color: #2d3748;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #cbd5e0;
+            transform: translateX(-3px);
+        }
+
+        .navbar h2 {
+            color: #2d3748;
+        }
+
+        .btn-signout {
+            padding: 10px 20px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .student-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .student-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 45px;
+        }
+
+        .student-header-info h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .student-meta {
+            display: flex;
+            gap: 20px;
+            color: #718096;
+            flex-wrap: wrap;
+        }
+
+        .student-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-icon.purple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .stat-icon.green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .stat-icon.orange { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .stat-icon.blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .section-header i {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .section-header h2 {
+            color: #2d3748;
+        }
+
+        .subjects-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .subject-card {
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 20px;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .subject-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .subject-info h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .subject-faculty {
+            color: #718096;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .subject-hours {
+            text-align: center;
+        }
+
+        .hours-value {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .hours-label {
+            font-size: 0.85em;
+            color: #718096;
+        }
+
+        .attendance-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .attendance-high {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .attendance-medium {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .attendance-low {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .timetable-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .day-schedule {
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .day-name {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            text-transform: uppercase;
+        }
+
+        .time-slots {
+            display: grid;
+            gap: 10px;
+        }
+
+        .time-slot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .time-range {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .subject-name {
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-danger {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-warning {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .status-safe {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-critical {
+            background: #fc8181;
+            color: white;
+        }
+
+        .events-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .event-item {
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .event-date {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .event-name {
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .days-left {
+            padding: 5px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.85em;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .no-data i {
+            font-size: 50px;
+            color: #cbd5e0;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .student-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .subject-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="navbar">
+        <div class="navbar-left">
+            <a href="{% url 'teacher_dashboard' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+            <h2>Student Details</h2>
+        </div>
+        <a href="{% url 'teacher_signout' %}" class="btn-signout">
+            <i class="fas fa-sign-out-alt"></i>
+            Sign Out
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Student Header -->
+        <div class="student-header">
+            <div class="student-avatar-large">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="student-header-info">
+                <h1>{{ student_user.first_name }} {{ student_user.last_name }}</h1>
+                <div class="student-meta">
+                    <span>
+                        <i class="fas fa-user"></i>
+                        Username: {{ student_user.username }}
+                    </span>
+                    <span>
+                        <i class="fas fa-envelope"></i>
+                        {{ student_user.email }}
+                    </span>
+                    {% if sem_start and sem_end %}
+                    <span>
+                        <i class="fas fa-calendar"></i>
+                        Semester: {{ sem_start.date }} to {{ sem_end.date }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div>
+                        <div class="stat-label">Overall Attendance</div>
+                        <div class="stat-value">{{ overall_attendance }}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <div class="stat-label">Classes Attended</div>
+                        <div class="stat-value">{{ total_attended }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div>
+                        <div class="stat-label">Total Classes</div>
+                        <div class="stat-value">{{ total_hrs }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <div class="stat-label">Subjects</div>
+                        <div class="stat-value">{{ subjects.count }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subject-wise Attendance -->
+        <div class="section">
+            <div class="section-header">
+                <i class="fas fa-book-open"></i>
+                <h2>Subject-wise Attendance</h2>
+            </div>
+
+            {% if subjects %}
+            <div class="subjects-grid">
+                {% for subject_data in subject_status %}
+                <div class="subject-card">
+                    <div class="subject-info">
+                        <h3>{{ subject_data.subject.subjectName }}</h3>
+                        <div class="subject-faculty">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            {{ subject_data.subject.facultyName }}
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <span class="status-badge status-{{ subject_data.status_type }}">
+                                {{ subject_data.status }}
+                            </span>
+                            <span style="color: #718096; font-size: 0.85em; margin-left: 10px;">
+                                ({{ subject_data.remaining_classes }} classes remaining)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="subject-hours">
+                        <div class="hours-value">{{ subject_data.subject.hours_attended }}/{{ subject_data.subject.total_hours }}</div>
+                        <div class="hours-label">Hours</div>
+                    </div>
+
+                    {% if subject_data.subject.attendance >= 75 %}
+                    <div class="attendance-circle attendance-high">
+                        {{ subject_data.subject.attendance }}%
+                    </div>
+                    {% elif subject_data.subject.attendance >= 60 %}
+                    <div class="attendance-circle attendance-medium">
+                        {{ subject_data.subject.attendance }}%
+                    </div>
+                    {% else %}
+                    <div class="attendance-circle attendance-low">
+                        {{ subject_data.subject.attendance }}%
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-data">
+                <i class="fas fa-book"></i>
+                <p>No subjects found</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Timetable -->
+        <div class="section">
+            <div class="section-header">
+                <i class="fas fa-calendar-alt"></i>
+                <h2>Weekly Timetable</h2>
+            </div>
+
+            <div class="timetable-grid">
+                {% for day, slots in timetable.items %}
+                    {% if slots %}
+                    <div class="day-schedule">
+                        <div class="day-name">{{ day|title }}</div>
+                        <div class="time-slots">
+                            {% for slot in slots %}
+                            <div class="time-slot">
+                                <span class="time-range">{{ slot.startTime|time:"g:i A" }} - {{ slot.endTime|time:"g:i A" }}</span>
+                                <span class="subject-name">{{ slot.subject.subjectName }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        {% if upcoming_events %}
+        <div class="section">
+            <div class="section-header">
+                <i class="fas fa-calendar-check"></i>
+                <h2>Upcoming Important Dates</h2>
+            </div>
+
+            <div class="events-list">
+                {% for event in upcoming_events %}
+                <div class="event-item">
+                    <div>
+                        <div class="event-date">{{ event.date }}</div>
+                        <div class="event-name">{{ event.context }}</div>
+                    </div>
+                    <div class="days-left">{{ event.days_left }} days</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

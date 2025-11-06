@@ -394,6 +394,176 @@
             font-size: 0.9rem;
         }
 
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .progress-fill.success {
+            background: linear-gradient(90deg, #27ae60 0%, #229954 100%);
+        }
+
+        /* Chatbot Widget Styles */
+        .chatbot-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .chat-bubble {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .chat-bubble:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+
+        .chat-bubble:active {
+            transform: scale(0.95);
+        }
+
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            opacity: 0;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .chat-tooltip {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            font-size: 0.9rem;
+            color: #333;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            animation: tooltipBounce 2s ease-in-out infinite;
+        }
+
+        .chat-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid white;
+        }
+
+        .chat-bubble:hover + .chat-tooltip {
+            opacity: 1;
+        }
+
+        @keyframes tooltipBounce {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+
+        .sparkle:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .sparkle:nth-child(2) {
+            top: 80%;
+            right: 10%;
+            animation-delay: 0.5s;
+        }
+
+        .sparkle:nth-child(3) {
+            top: 50%;
+            left: -5%;
+            animation-delay: 1s;
+        }
+
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
@@ -417,30 +587,17 @@
             .btn {
                 width: 100%;
             }
-        }
 
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
+            .chatbot-widget {
+                bottom: 20px;
+                right: 20px;
+            }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            transition: width 0.3s ease;
-        }
-
-        .progress-fill.danger {
-            background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
-        }
-
-        .progress-fill.success {
-            background: linear-gradient(90deg, #27ae60 0%, #229954 100%);
+            .chat-bubble {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
@@ -603,6 +760,8 @@
         </footer>
     </div>
 
+    
+
     <script>
         // Subject-wise attendance chart
         const ctx = document.getElementById('subjectChart').getContext('2d');
@@ -696,6 +855,9 @@
                 }
             }
         });
+
+        // Chatbot functionality
+    
     </script>
 </body>
 </html>

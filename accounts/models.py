@@ -2,13 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Student(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="students")
-    total_attendance = models.DecimalField(null=True,max_digits=5,decimal_places=2)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="student_profile")
+    total_attendance = models.DecimalField(null=True, max_digits=5, decimal_places=2)
+    enrollment_number = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
-        return self.total_attendance
+        return f"{self.user.username} - {self.total_attendance}%"
+    
     class Meta:
         db_table = "Student"
+
 
 # class Timetable(models.Model):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="timetables")

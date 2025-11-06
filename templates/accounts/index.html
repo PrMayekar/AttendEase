@@ -7,31 +7,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account authentication</title>
     <link rel="stylesheet" href="{% static 'accounts/index.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .divider span {
+            padding: 0 15px;
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .portal-label {
+            text-align: center;
+            color: #4a5568;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .button-group {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <!-- <h1>Welcome </h1>
-
-    {% for message in messages %}
-    <div class="alert alert-{{message.tags}} alert-dismissable fade show" role="alert">
-        <strong>Message:</strong>{{message}}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    {% endfor %}
-
-
-    {% if user.is_authenticated %}
-    <h3>Hello {{ fname }}</h3>
-    <h4>You're successfully logged in.</h4>
-    <button type="submit"><a href="/signout">SignOut</a></button>
-    <button type="submit"><a href="/dashboard">Dashboard</a></button>
-    {% else %}
-    <button type="submit"><a href="/signup">SignUp</a></button>
-    <button type="submit"><a href="/signin">SignIn</a></button>
-    {% endif %} -->
-
-
     <div class="container">
         <div class="auth-card">
             <div class="header">
@@ -65,9 +76,9 @@
                 <p class="welcome-text">You're successfully logged in to your account.</p>
                 
                 <div class="button-group">
-                    <a href="/signin" class="btn btn-primary">
+                    <a href="/homepage" class="btn btn-primary">
                         <i class="fas fa-tachometer-alt"></i>
-                        Sign In
+                        Dashboard
                     </a>
                     <a href="/signout" class="btn btn-secondary">
                         <i class="fas fa-sign-out-alt"></i>
@@ -79,16 +90,42 @@
             <!-- Unauthenticated User Section -->
             {% else %}
             <div class="auth-section">
-                <p class="auth-text">Please sign in to access your account or create a new one.</p>
+                <!-- Student Portal Section -->
+                <p class="portal-label">
+                    <i class="fas fa-user-graduate"></i> STUDENT PORTAL
+                </p>
+                <p class="auth-text">Track your attendance and academic progress</p>
                 
                 <div class="button-group">
                     <a href="/signin" class="btn btn-primary">
                         <i class="fas fa-sign-in-alt"></i>
-                        Sign In
+                        Student Sign In
                     </a>
                     <a href="/signup" class="btn btn-outline">
                         <i class="fas fa-user-plus"></i>
-                        Sign Up
+                        Student Sign Up
+                    </a>
+                </div>
+                
+                <!-- Divider -->
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+                
+                <!-- Teacher Portal Section -->
+                <p class="portal-label">
+                    <i class="fas fa-chalkboard-teacher"></i> TEACHER PORTAL
+                </p>
+                <p class="auth-text">Monitor and manage student attendance records</p>
+                
+                <div class="button-group">
+                    <a href="/teachers/signin/" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Teacher Sign In
+                    </a>
+                    <a href="/teachers/signup/" class="btn btn-outline">
+                        <i class="fas fa-user-tie"></i>
+                        Teacher Sign Up
                     </a>
                 </div>
                 
@@ -110,7 +147,7 @@
             {% endif %}
         </div>
     </div>
-
+    
     <script>
         // Add some interactive effects
         document.addEventListener('DOMContentLoaded', function() {

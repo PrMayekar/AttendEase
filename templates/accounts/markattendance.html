@@ -3,13 +3,475 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Mark Attendance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Alert Styles */
+        .alert {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-content {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            gap: 15px;
+            position: relative;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 5px solid #28a745;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+            border-left: 5px solid #ffc107;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-left: 5px solid #dc3545;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            border-left: 5px solid #17a2b8;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .alert-success .alert-icon {
+            color: #28a745;
+        }
+
+        .alert-warning .alert-icon {
+            color: #ffc107;
+        }
+
+        .alert-danger .alert-icon {
+            color: #dc3545;
+        }
+
+        .alert-info .alert-icon {
+            color: #17a2b8;
+        }
+
+        .alert-text {
+            flex: 1;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .alert-text strong {
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .alert-close {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+            transform: rotate(90deg);
+        }
+
+        /* Main Container */
+        .today {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .today h2 {
+            color: #667eea;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .today-date {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .today-date i {
+            color: #667eea;
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .subject-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .subject-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .subject-item:hover::before {
+            width: 8px;
+        }
+
+        .subject-item.checked {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-color: #27ae60;
+        }
+
+        .subject-item.checked::before {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            width: 8px;
+        }
+
+        .subject-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .subject-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .subject-item.checked .subject-icon {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        /* Custom Checkbox */
+        .checkbox-wrapper {
+            position: relative;
+        }
+
+        input[type="checkbox"] {
+            appearance: none;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            background: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="checkbox"]:checked {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        input[type="checkbox"]:checked::before {
+            left: 32px;
+        }
+
+        input[type="checkbox"]:hover {
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Submit Button */
+        button[type="submit"] {
+            margin-top: 20px;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(-1px);
+        }
+
+        button[type="submit"] i {
+            font-size: 1.2rem;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 12px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2196f3;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Back Button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            color: #667eea;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            background: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #666;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #999;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .today {
+                padding: 25px 20px;
+            }
+
+            .today h2 {
+                font-size: 1.5rem;
+            }
+
+            .subject-item {
+                padding: 15px 18px;
+            }
+
+            .subject-name {
+                font-size: 1rem;
+            }
+
+            .subject-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+            }
+
+            .back-button {
+                position: static;
+                width: 100%;
+                max-width: 800px;
+                margin-bottom: 15px;
+                justify-content: center;
+            }
+
+            button[type="submit"] {
+                padding: 16px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
+    <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+    </a>
+
     {% for message in messages %}
-        <div class="alert alert-{{message.tags}}" role="alert">
+        <div class="alert alert-{{message.tags|default:'info'}}" role="alert">
             <div class="alert-content">
-                <i class="alert-icon fas fa-info-circle"></i>
+                <i class="alert-icon fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% elif message.tags == 'danger' %}times-circle{% else %}info-circle{% endif %}"></i>
                 <div class="alert-text">
                     <strong>Message:</strong> {{message}}
                 </div>
@@ -19,19 +481,134 @@
             </div>
         </div>
     {% endfor %}
+
     <div class="today">
-        <h2>📅 Today's Subjects</h2>
-        <form action="/markattendance" method="POST">
+        <h2>📅 Mark Today's Attendance</h2>
+        <div class="today-date">
+            <i class="fas fa-calendar-day"></i>
+            <span id="currentDate"></span>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value" id="totalSubjects">{{todaysubjects|length|default:0}}</span>
+                <span class="stat-label">Total Classes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="checkedCount">0</span>
+                <span class="stat-label">Attended</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="attendancePercent">0%</span>
+                <span class="stat-label">Attendance Rate</span>
+            </div>
+        </div>
+
+        {% if todaysubjects %}
+        <form action="/markattendance" method="POST" onsubmit="return handleSubmit(event)">
             {% csrf_token %}
             {% for index in todaysubjects %}
-                <div class="subject-item">
-                    {{ index }}
-                    <input type="checkbox" name="{{index.subject}}" value="Attended">
-                </div>
+                <label class="subject-item" onclick="toggleSubject(this)">
+                    <div class="subject-name">
+                        <div class="subject-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        {{ index }}
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" name="{{index.subject}}" value="Attended" onchange="updateStats()">
+                    </div>
+                </label>
             {% endfor %}
-            <button type="submit">Submit</button>
-        </form>  
+            <button type="submit" id="submitBtn">
+                <i class="fas fa-check-circle"></i>
+                <span>Submit Attendance</span>
+            </button>
+        </form>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <h3>No Classes Today</h3>
+            <p>Enjoy your day off! There are no scheduled classes for today.</p>
+        </div>
+        {% endif %}
     </div>
 
+    <script>
+        // Display current date
+        const dateElement = document.getElementById('currentDate');
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.textContent = today.toLocaleDateString('en-US', options);
+
+        // Toggle subject checked state
+        function toggleSubject(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('checked');
+            } else {
+                element.classList.remove('checked');
+            }
+            
+            updateStats();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const total = checkboxes.length;
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            const percentage = total > 0 ? Math.round((checked / total) * 100) : 0;
+
+            document.getElementById('checkedCount').textContent = checked;
+            document.getElementById('attendancePercent').textContent = percentage + '%';
+
+            // Update visual feedback
+            checkboxes.forEach(checkbox => {
+                const subjectItem = checkbox.closest('.subject-item');
+                if (checkbox.checked) {
+                    subjectItem.classList.add('checked');
+                } else {
+                    subjectItem.classList.remove('checked');
+                }
+            });
+        }
+
+        // Handle form submission
+        function handleSubmit(event) {
+            const submitBtn = document.getElementById('submitBtn');
+            const checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            
+            if (checkedCount === 0) {
+                event.preventDefault();
+                alert('⚠️ Please mark attendance for at least one subject before submitting.');
+                return false;
+            }
+
+            // Show loading state
+            submitBtn.innerHTML = '<div class="loading"></div> <span>Submitting...</span>';
+            submitBtn.disabled = true;
+            
+            return true;
+        }
+
+        // Initialize stats on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-20px)';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
 </body>
 </html>

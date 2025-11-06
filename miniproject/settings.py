@@ -24,6 +24,12 @@ EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
 EMAIL_PORT = EMAIL_PORT
 
 
+# ...existing code...
+
+# Ollama Chatbot Settings
+OLLAMA_API_URL = 'http://localhost:11434/api/generate'
+OLLAMA_MODEL = 'llama2'  # or your preferred model
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -47,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'teachers',
 ]
 
 MIDDLEWARE = [
