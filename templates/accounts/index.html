@@ -1,0 +1,141 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account authentication</title>
+    <link rel="stylesheet" href="{% static 'accounts/index.css' %}">
+</head>
+<body>
+    <!-- <h1>Welcome </h1>
+
+    {% for message in messages %}
+    <div class="alert alert-{{message.tags}} alert-dismissable fade show" role="alert">
+        <strong>Message:</strong>{{message}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+
+
+    {% if user.is_authenticated %}
+    <h3>Hello {{ fname }}</h3>
+    <h4>You're successfully logged in.</h4>
+    <button type="submit"><a href="/signout">SignOut</a></button>
+    <button type="submit"><a href="/dashboard">Dashboard</a></button>
+    {% else %}
+    <button type="submit"><a href="/signup">SignUp</a></button>
+    <button type="submit"><a href="/signin">SignIn</a></button>
+    {% endif %} -->
+
+
+    <div class="container">
+        <div class="auth-card">
+            <div class="header">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1>Welcome</h1>
+                <p class="subtitle">Secure Account Portal</p>
+            </div>
+
+            <!-- Messages Section -->
+            {% for message in messages %}
+            <div class="alert alert-{{message.tags}}" role="alert">
+                <div class="alert-content">
+                    <i class="fas fa-info-circle alert-icon"></i>
+                    <span class="alert-text">{{message}}</span>
+                    <button type="button" class="alert-close" onclick="this.parentElement.parentElement.style.display='none'">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Authenticated User Section -->
+            {% if user.is_authenticated %}
+            <div class="welcome-section">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h2>Hello, {{ fname }}!</h2>
+                <p class="welcome-text">You're successfully logged in to your account.</p>
+                
+                <div class="button-group">
+                    <a href="/signin" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Sign In
+                    </a>
+                    <a href="/signout" class="btn btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+
+            <!-- Unauthenticated User Section -->
+            {% else %}
+            <div class="auth-section">
+                <p class="auth-text">Please sign in to access your account or create a new one.</p>
+                
+                <div class="button-group">
+                    <a href="/signin" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </a>
+                    <a href="/signup" class="btn btn-outline">
+                        <i class="fas fa-user-plus"></i>
+                        Sign Up
+                    </a>
+                </div>
+                
+                <div class="features">
+                    <div class="feature">
+                        <i class="fas fa-lock"></i>
+                        <span>Secure Login</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Mobile Friendly</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-clock"></i>
+                        <span>24/7 Access</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Auto-hide alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 300);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

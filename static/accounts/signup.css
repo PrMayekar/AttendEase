@@ -1,0 +1,108 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", "Segoe UI", Tahoma, sans-serif;
+}
+
+/* Background */
+body {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 15px;
+}
+
+/* Form container */
+form {
+    background: #fff;
+    padding: 45px 40px;
+    border-radius: 18px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    animation: fadeIn 0.7s ease-in-out;
+}
+
+/* Title */
+form::before {
+    content: "Create Your Account";
+    display: block;
+    font-size: 22px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 25px;
+}
+
+/* Labels */
+form label {
+    display: block;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 6px;
+}
+
+/* Inputs */
+form input {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+form input:focus {
+    border-color: #38ef7d;
+    box-shadow: 0 0 6px rgba(56, 239, 125, 0.4);
+    outline: none;
+}
+
+/* Button */
+form button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+form button:hover {
+    background: linear-gradient(135deg, #0f897f, #32d46d);
+    transform: translateY(-2px);
+}
+
+/* Extra link */
+form .extra {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #555;
+}
+
+form .extra a {
+    color: #11998e;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+form .extra a:hover {
+    text-decoration: underline;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #667eea;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header-info {
+            display: flex;
+            gap: 30px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .header-info span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card {
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-card.warning .value {
+            color: #f39c12;
+        }
+
+        .stat-card.danger .value {
+            color: #e74c3c;
+        }
+
+        .stat-card.success .value {
+            color: #27ae60;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .subject-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .subject-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .subject-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .subject-item.danger {
+            border-left-color: #e74c3c;
+            background: #fee;
+        }
+
+        .subject-item.warning {
+            border-left-color: #f39c12;
+            background: #fff8e1;
+        }
+
+        .subject-name {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #333;
+        }
+
+        .subject-percentage {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .subject-percentage.red {
+            color: #e74c3c;
+        }
+
+        .subject-percentage.green {
+            color: #27ae60;
+        }
+
+        .status-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .status-item {
+            padding: 18px 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .status-item.critical {
+            background: #fee;
+            border-left-color: #e74c3c;
+        }
+
+        .status-item.action-needed {
+            background: #fff8e1;
+            border-left-color: #f39c12;
+        }
+
+        .status-item.good {
+            background: #e8f5e9;
+            border-left-color: #27ae60;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .today-subjects {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .today-chip {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .event-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .event-timeline::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .event-timeline::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .event-timeline::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .event-item {
+            padding: 18px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .event-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .event-item.urgent {
+            border-left-color: #e74c3c;
+            background: linear-gradient(135deg, #fee 0%, #fdd 100%);
+        }
+
+        .event-item.soon {
+            border-left-color: #f39c12;
+            background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
+        }
+
+        .event-date {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .event-title {
+            font-size: 1.05rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .days-left {
+            position: absolute;
+            top: 18px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .days-left.urgent {
+            background: #e74c3c;
+        }
+
+        .days-left.soon {
+            background: #f39c12;
+        }
+
+        .no-events {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .info-message {
+            padding: 15px 20px;
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            border-radius: 8px;
+            color: #1976d2;
+            font-weight: 500;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .progress-fill.success {
+            background: linear-gradient(90deg, #27ae60 0%, #229954 100%);
+        }
+    </style>
+</head>
+<body>
+    {% for message in messages %}
+    <div class="alert" role="alert">
+        <strong>Message:</strong> {{message}}
+    </div>
+    {% endfor %}
+
+    <div class="dashboard-container">
+        <header>
+            <h1>📊 Attendance Dashboard</h1>
+            <div class="header-info">
+                <span>📅 {{semStart.date}} - {{semEnd.date}}</span>
+                <span>📚 Total Days: {{count}}</span>
+            </div>
+        </header>
+
+        <!-- Overall Stats -->
+        <div class="grid-container">
+            <div class="card stat-card {% if total_attendance >= 85 %}success{% elif total_attendance >= 75 %}warning{% else %}danger{% endif %}">
+                <h3>Overall Attendance</h3>
+                <div class="value">{{total_attendance}}%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill {% if total_attendance >= 75 %}success{% else %}danger{% endif %}" 
+                         style="width: {{total_attendance}}%"></div>
+                </div>
+            </div>
+
+            <div class="card stat-card">
+                <h3>Total Hours</h3>
+                <div class="value">{{total_hrs}}</div>
+                <p style="color: #666; margin-top: 10px;">Total lecture hours</p>
+            </div>
+
+            <div class="card stat-card success">
+                <h3>Attended Hours</h3>
+                <div class="value">{{total_attended_hrs}}</div>
+                <p style="color: #666; margin-top: 10px;">Hours you've attended</p>
+            </div>
+        </div>
+
+        <!-- Subject-wise Attendance with Chart and Important Events -->
+        <div class="grid-container">
+            <div class="card" style="grid-column: span 1;">
+                <h2 class="section-title">📚 Subject Attendance</h2>
+                <div class="chart-container">
+                    <canvas id="subjectChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title">🎯 Upcoming Events</h2>
+                {% if upcoming_events %}
+                <div class="event-timeline">
+                    {% for event in upcoming_events %}
+                    <div class="event-item {% if event.days_left <= 3 %}urgent{% elif event.days_left <= 7 %}soon{% endif %}">
+                        <div class="event-date">📅 {{event.date}}</div>
+                        <div class="event-title">{{event.event}}</div>
+                        <div class="days-left {% if event.days_left <= 3 %}urgent{% elif event.days_left <= 7 %}soon{% endif %}">
+                            {% if event.days_left == 0 %}
+                            Today
+                            {% elif event.days_left == 1 %}
+                            Tomorrow
+                            {% else %}
+                            {{event.days_left}} days
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-events">
+                    <p>🎉 No upcoming events in the next few weeks</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Subject Details List -->
+        <div class="card">
+            <h2 class="section-title">📋 Subject Details</h2>
+            <div class="subject-list">
+                {% for obj in subjects %}
+                <div class="subject-item {% if obj.attendance < 75 %}danger{% elif obj.attendance < 85 %}warning{% endif %}">
+                    <span class="subject-name">{{obj.subjectName}}</span>
+                    <span class="subject-percentage {% if obj.attendance < 75 %}red{% else %}green{% endif %}">
+                        {{obj.attendance}}%
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Attendance Status -->
+        <div class="card">
+            <h2 class="section-title">📈 Attendance Status & Recommendations</h2>
+            <div class="status-grid">
+                {% for value,label,subname in status %}
+                <div class="status-item {% if label == 'never' %}critical{% elif label == 'must attend' %}action-needed{% else %}good{% endif %}">
+                    <span class="status-label">{{subname}}</span>
+                    <span class="status-value">
+                        {% if label == "never" %}
+                            ❌ Not recoverable
+                        {% elif label == "must attend" %}
+                            ⚠️ Need {{value}} more hrs
+                        {% else %}
+                            ✅ Can miss {{value}} hrs
+                        {% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Today's Schedule -->
+        <div class="card">
+            <h2 class="section-title">📅 Today's Schedule</h2>
+            {% if todaysubjects %}
+            <div class="today-subjects">
+                {% for index in todaysubjects %}
+                <div class="today-chip">{{index}}</div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color: #666; font-style: italic;">No classes scheduled for today</p>
+            {% endif %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card">
+            <h2 class="section-title">⚡ Quick Actions</h2>
+            <div class="action-buttons">
+                <form action="/markattendance" method="GET" style="flex: 1;">
+                    {% csrf_token %}
+                    {% if not flag %}
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        ✓ Mark Today's Attendance
+                    </button>
+                    {% else %}
+                    <div class="info-message">
+                        ✓ Today's attendance has been updated!
+                    </div>
+                    {% endif %}
+                </form>
+
+                <a href="/updateattendance" class="btn btn-secondary" style="flex: 1;">
+                    📝 Update Previous Attendance
+                </a>
+
+                <a href="/updatecalendar" class="btn btn-secondary" style="flex: 1;">
+                    📆 Manage Calendar & Events
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            © {{current_year|default:"2025"}} Attendance Tracker — All Rights Reserved
+        </footer>
+    </div>
+
+    <script>
+        // Subject-wise attendance chart
+        const ctx = document.getElementById('subjectChart').getContext('2d');
+        
+        const subjectData = {
+            labels: [
+                {% for obj in subjects %}
+                '{{obj.subjectName}}'{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Attendance %',
+                data: [
+                    {% for obj in subjects %}
+                    {{obj.attendance}}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    {% for obj in subjects %}
+                    {% if obj.attendance < 75 %}
+                    'rgba(231, 76, 60, 0.7)'
+                    {% elif obj.attendance < 85 %}
+                    'rgba(243, 156, 18, 0.7)'
+                    {% else %}
+                    'rgba(39, 174, 96, 0.7)'
+                    {% endif %}
+                    {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                borderColor: [
+                    {% for obj in subjects %}
+                    {% if obj.attendance < 75 %}
+                    'rgba(231, 76, 60, 1)'
+                    {% elif obj.attendance < 85 %}
+                    'rgba(243, 156, 18, 1)'
+                    {% else %}
+                    'rgba(39, 174, 96, 1)'
+                    {% endif %}
+                    {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: subjectData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                return 'Attendance: ' + context.parsed.y + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

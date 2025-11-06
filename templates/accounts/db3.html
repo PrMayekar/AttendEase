@@ -1,0 +1,204 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>db3</title>
+    <link rel="stylesheet" href="{% static 'accounts/db3.css' %}">
+</head>
+<body>
+    <!-- {% for message in messages %}
+    <div class="alert alert-{{message.tags}} alert-dismissable fade show" role="alert">
+        <strong>Message:</strong>{{message}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+    <h1>Enter Academic Calendar</h1>
+    <form method="post" enctype="multipart/form-data" action="/db3">
+        {% csrf_token %}
+        <label>Select CSV file:</label>
+        <input type="file" name="file" accept=".csv" required>
+        <button type="submit">Upload</button>
+    </form> -->
+
+     <div class="container">
+        <div class="upload-card">
+            <!-- Header Section -->
+            <div class="header">
+                <div class="logo">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h1>Academic Calendar</h1>
+                <p class="subtitle">Upload your CSV data file</p>
+            </div>
+
+            <!-- Messages Section -->
+            {% for message in messages %}
+            <div class="alert alert-{{message.tags}}" role="alert">
+                <div class="alert-content">
+                    <i class="fas fa-info-circle alert-icon"></i>
+                    <span class="alert-text">{{message}}</span>
+                    <button type="button" class="alert-close" onclick="this.parentElement.parentElement.style.display='none'">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Upload Form Section -->
+            <div class="upload-section">
+                <form method="post" enctype="multipart/form-data" action="/db3" id="uploadForm">
+                    {% csrf_token %}
+                    
+                    <!-- File Upload Area -->
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3>Drop your CSV file here</h3>
+                            <p>or <span class="browse-text">browse</span> to choose a file</p>
+                            <input type="file" name="file" id="fileInput" accept=".csv" required>
+                        </div>
+                        <div class="file-info" id="fileInfo" style="display: none;">
+                            <div class="file-details">
+                                <i class="fas fa-file-csv file-icon"></i>
+                                <div class="file-text">
+                                    <span class="file-name" id="fileName"></span>
+                                    <span class="file-size" id="fileSize"></span>
+                                </div>
+                                <button type="button" class="remove-file" id="removeFile">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File Requirements -->
+                    <div class="requirements">
+                        <h4><i class="fas fa-info-circle"></i> File Requirements</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> CSV format only (.csv)</li>
+                            <li><i class="fas fa-check"></i> Maximum file size: 10MB</li>
+                            <li><i class="fas fa-check"></i> Must contain valid academic calendar data</li>
+                            <li><i class="fas fa-check"></i> First row should contain headers</li>
+                        </ul>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                        <i class="fas fa-upload"></i>
+                        <span>Upload Calendar Data</span>
+                        <div class="loading-spinner" id="loadingSpinner">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Help Section -->
+            <div class="help-section">
+                <div class="help-item">
+                    <i class="fas fa-question-circle"></i>
+                    <div>
+                        <strong>Need help?</strong>
+                        <p>Make sure your CSV file contains academic calendar information with proper date formatting.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const removeFile = document.getElementById('removeFile');
+            const submitBtn = document.getElementById('submitBtn');
+            const uploadForm = document.getElementById('uploadForm');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            // File drag and drop functionality
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileSelect(files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0]);
+                }
+            });
+
+            removeFile.addEventListener('click', () => {
+                fileInput.value = '';
+                fileInfo.style.display = 'none';
+                uploadArea.querySelector('.upload-content').style.display = 'block';
+                submitBtn.disabled = true;
+            });
+
+            function handleFileSelect(file) {
+                if (file && file.type === 'text/csv') {
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+                    fileInfo.style.display = 'block';
+                    uploadArea.querySelector('.upload-content').style.display = 'none';
+                    submitBtn.disabled = false;
+                } else {
+                    alert('Please select a valid CSV file.');
+                    fileInput.value = '';
+                }
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Form submission with loading state
+            uploadForm.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.querySelector('span').textContent = 'Uploading...';
+                loadingSpinner.style.display = 'inline-block';
+            });
+
+            // Auto-hide alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 300);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

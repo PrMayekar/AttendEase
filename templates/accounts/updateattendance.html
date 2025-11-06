@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Attendance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .subjects-grid {
+            display: grid;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .subject-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .subject-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .subject-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-value.percentage {
+            color: #27ae60;
+        }
+
+        .stat-value.percentage.low {
+            color: #e74c3c;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-wrapper label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .input-wrapper input {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+
+            .current-stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .info-box p {
+            color: #1976d2;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Update Previous Attendance</h1>
+            <p>Modify your attendance records for any subject</p>
+        </div>
+
+        <div class="info-box">
+            <p>💡 <strong>Tip:</strong> Update the total hours and attended hours for each subject. The attendance percentage will be calculated automatically.</p>
+        </div>
+
+        <form action="/updateattendance" method="POST">
+            {% csrf_token %}
+            <div class="subjects-grid">
+                {% for s in sub %}
+                <div class="subject-card">
+                    <div class="subject-name">
+                        📚 {{s.subjectName}}
+                    </div>
+
+                    <div class="current-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Total Hours</div>
+                            <div class="stat-value">{{s.total_hours}}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Attended</div>
+                            <div class="stat-value">{{s.hours_attended}}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Current %</div>
+                            <div class="stat-value percentage {% if s.attendance < 75 %}low{% endif %}">
+                                {{s.attendance}}%
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <label for="{{s.subjectName}}_total_hrs">
+                                🕐 New Total Hours
+                            </label>
+                            <input 
+                                type="number" 
+                                name="{{s.subjectName}}_total_hrs" 
+                                id="{{s.subjectName}}_total_hrs"
+                                value="{{s.total_hours}}"
+                                min="0"
+                                required>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="{{s.subjectName}}_attended_hrs">
+                                ✓ New Attended Hours
+                            </label>
+                            <input 
+                                type="number" 
+                                name="{{s.subjectName}}_attended_hrs" 
+                                id="{{s.subjectName}}_attended_hrs"
+                                value="{{s.hours_attended}}"
+                                min="0"
+                                required>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">
+                    ✓ Save Changes
+                </button>
+                <a href="/db4" class="btn btn-secondary">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

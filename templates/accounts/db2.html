@@ -1,0 +1,203 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>db2</title>
+    <link rel="stylesheet" href="{% static 'accounts/db2.css' %}">
+</head>
+<!-- <body>
+    {% for message in messages %}
+    <div class="alert alert-{{message.tags}} alert-dismissable fade show" role="alert">
+        <strong>Message:</strong>{{message}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+    <h1>Enter timetable</h1>
+    <form method="post" enctype="multipart/form-data" action="/db2">
+        {% csrf_token %}
+        <label>Select CSV file:</label>
+        <input type="file" name="file" accept=".csv" required>
+        <button type="submit">Upload</button>
+    </form>
+</body> -->
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-nav">
+                <a href="/dashboard" class="back-link">
+                    ← Back to Dashboard
+                </a>
+            </div>
+            <h1>📅 Upload Timetable</h1>
+            <p>Import your academic schedule from a CSV file</p>
+        </header>
+
+        <!-- Messages Section -->
+        {% for message in messages %}
+        <div class="alert alert-{{message.tags}}" role="alert">
+            <div class="alert-content">
+                <div class="alert-text">
+                    <strong>Message:</strong> {{message}}
+                </div>
+                <button type="button" class="alert-close" onclick="this.parentElement.parentElement.style.display='none'">
+                    ×
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Main Content -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📄 CSV File Upload</h2>
+                <p>Select your timetable CSV file to import schedule data</p>
+            </div>
+            <div class="card-body">
+                <!-- File Upload Form -->
+                <form method="post" enctype="multipart/form-data" action="/db2" id="uploadForm">
+                    {% csrf_token %}
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            ☁️
+                        </div>
+                        <div class="upload-text">
+                            <h3>Choose CSV file or drag and drop</h3>
+                            <p>Select your timetable file to upload</p>
+                            <small>Maximum file size: 10MB</small>
+                        </div>
+                        <input type="file" 
+                               name="file" 
+                               id="fileInput" 
+                               accept=".csv" 
+                               required 
+                               class="file-input">
+                    </div>
+
+                    <div class="file-info" id="fileInfo">
+                        <div class="file-details">
+                            <span class="file-icon">📄</span>
+                            <div class="file-text">
+                                <span class="file-name" id="fileName"></span>
+                                <span class="file-size" id="fileSize"></span>
+                            </div>
+                            <button type="button" class="remove-file" id="removeFile">
+                                ×
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                            📤 Upload Timetable
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Upload Instructions -->
+                <div class="instructions">
+                    <h3>ℹ️ CSV Format Requirements</h3>
+                    <ul class="instruction-list">
+                        <li><span class="checkmark">✓</span> Include column headers in the first row</li>
+                        <li><span class="checkmark">✓</span> Use comma-separated values format</li>
+                        <li><span class="checkmark">✓</span> Ensure proper time format (HH:MM)</li>
+                        <li><span class="checkmark">✓</span> Include subject and faculty information</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const removeFile = document.getElementById('removeFile');
+            const submitBtn = document.getElementById('submitBtn');
+            const uploadForm = document.getElementById('uploadForm');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            // Click to select file
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type === 'text/csv') {
+                    fileInput.files = files;
+                    handleFileSelection();
+                }
+            });
+
+            // File input change
+            fileInput.addEventListener('change', handleFileSelection);
+
+            // Remove file
+            removeFile.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.value = '';
+                fileInfo.style.display = 'none';
+                uploadArea.style.display = 'flex';
+                submitBtn.disabled = true;
+            });
+
+            // Form submission
+            uploadForm.addEventListener('submit', (e) => {
+                if (fileInput.files.length > 0) {
+                    loadingOverlay.style.display = 'flex';
+                }
+            });
+
+            function handleFileSelection() {
+                const file = fileInput.files[0];
+                if (file) {
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+                    fileInfo.style.display = 'block';
+                    uploadArea.style.display = 'none';
+                    submitBtn.disabled = false;
+                }
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Auto-hide alerts
+            document.querySelectorAll('.alert').forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 300);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+
+</html>
