@@ -59,20 +59,13 @@ Partial    (attends k of U):        (A + k) / (T + U) × 100
  
 ## Screenshots
  
-> Add your screenshots here after running the application.
  
-```
-screenshots/
-├── dashboard.png
-├── upload.png
-├── recovery_plan.png
-└── teacher_portal.png
-```
- 
-![Dashboard](screenshots/dashboard.png)
-![Recovery Plan](screenshots/recovery_plan.png)
-![Upload Screen](screenshots/upload.png)
-![Teacher Portal](screenshots/teacher_portal.png)
+![Dashboard](screenshots/student_dashboard.png)
+Student Insights
+![Recovery Plan](screenshots/student_insights.png)
+Subjectwise Attendance Insights
+![Upload Screen](screenshots/teacher_dashboard.png)
+Teacher Insights
  
 ---
  
