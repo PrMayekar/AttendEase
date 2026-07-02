@@ -4,4 +4,3 @@ sqlparse==0.5.3
 tzdata==2025.2
 six==1.17.0
 mysql-connector-python==9.4.0
-mysqlclient==2.2.7
